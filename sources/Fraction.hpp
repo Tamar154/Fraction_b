@@ -130,13 +130,14 @@ namespace ariel
         friend std::istream &operator>>(std::istream &input, Fraction &frac);
         friend std::istream &operator>>(std::istream &input, float &flo);
 
-        void reduceFrac(); // friend??
+        void reduceFrac(); 
         static float floatThreeDecimalAcc(float flo)
         {
             // std::cout << (int)(flo * 1000) / 1000.0 << std::endl;
-            return static_cast<int>(flo * ACC_FACTOR) / static_cast<float>(ACC_FACTOR);
+            return static_cast<float>(static_cast<int>(flo * ACC_FACTOR)) / ACC_FACTOR;
+            // return static_cast<int>(flo * ACC_FACTOR) / static_cast<float>(ACC_FACTOR);
 
-        } // friend??
+        } 
     };
 
 }

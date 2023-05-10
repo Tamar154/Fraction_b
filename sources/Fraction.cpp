@@ -2,10 +2,13 @@
 
 #include <numeric>
 #include <cmath>
+#include <climits>
 
 using namespace ariel;
 
 using namespace std;
+
+void checkOverflow(int, int, char);
 
 // Default constructor
 Fraction::Fraction() : _numerator(0), _denominator(1) {}
@@ -35,7 +38,6 @@ Fraction::Fraction(const int &numerator, const int &denominator)
     }
 
     reduceFrac();
-    // cout << "Frac(int, int) constructor: " << this->_numerator << "/" << this->_denominator << endl;
 }
 
 // Constructor that gets a float number
@@ -45,7 +47,6 @@ Fraction::Fraction(const float &num)
     _numerator = num_copy * 1000;
     _denominator = 1000;
     reduceFrac();
-    // cout << "Frac(float) constructor: " << this->_numerator << "/" << this->_denominator << endl;
 }
 
 /*
@@ -58,11 +59,16 @@ Fraction Fraction::operator+(const Fraction &other) const
     int denom1 = _denominator;
     int denom2 = other._denominator;
 
+    checkOverflow(denom1, denom2, '*');
     int commonDenom = denom1 * denom2;
 
+    checkOverflow(numer1, denom2, '*');
     numer1 *= denom2;
+
+    checkOverflow(numer2, denom1, '*');
     numer2 *= denom1;
 
+    checkOverflow(numer1, numer2, '+');
     int numerator = numer1 + numer2;
 
     Fraction result(numerator, commonDenom);
@@ -79,7 +85,6 @@ Fraction Fraction::operator+(const float &flo) const
 /*
     Subtraction
 */
-
 Fraction Fraction::operator-(const Fraction &other) const
 {
     int numer1 = _numerator;
@@ -87,11 +92,16 @@ Fraction Fraction::operator-(const Fraction &other) const
     int denom1 = _denominator;
     int denom2 = other._denominator;
 
+    checkOverflow(denom1, denom2, '*');
     int commonDenom = denom1 * denom2;
 
+    checkOverflow(numer1, denom2, '*');
     numer1 *= denom2;
+
+    checkOverflow(numer2, denom1, '*');
     numer2 *= denom1;
 
+    checkOverflow(numer1, numer2, '-');
     int numerator = numer1 - numer2;
 
     Fraction result(numerator, commonDenom);
@@ -110,6 +120,10 @@ Fraction Fraction::operator-(const float &flo) const
 */
 Fraction Fraction::operator*(const Fraction &other) const
 {
+
+    checkOverflow(this->_numerator, other._numerator, '*');
+    checkOverflow(this->_denominator, other._denominator, '*');
+
     int numerator = this->_numerator * other._numerator;
     int denominator = this->_denominator * other._denominator;
 
@@ -133,11 +147,9 @@ Fraction Fraction::operator/(const Fraction &other) const
     {
         throw runtime_error("Cannot divide by zero!");
     }
-    int numerator = this->_numerator * other._denominator;
-    int denominator = this->_denominator * other._numerator;
 
-    Fraction result(numerator, denominator);
-    return result;
+    Fraction frac2(other._denominator, other._numerator);
+    return *this * frac2;
 }
 
 Fraction Fraction::operator/(const float &flo) const
@@ -164,7 +176,6 @@ bool Fraction::operator==(const Fraction &other) const
 bool Fraction::operator==(const float &flo) const
 {
     Fraction frac(flo);
-    // cout << frac._numerator << "/" << frac._denominator << endl;
     return *this == Fraction(flo);
 }
 
@@ -219,7 +230,6 @@ Fraction Fraction::operator--(int postfix) // postfix
 /*
     Output
 */
-
 ostream &ariel::operator<<(ostream &output, const Fraction &frac)
 {
     output << frac.getNumerator() << "/" << frac.getDenominator();
@@ -278,5 +288,32 @@ void Fraction::reduceFrac()
     {
         _numerator /= gcd_val;
         _denominator /= gcd_val;
+    }
+}
+
+void checkOverflow(int a, int b, char op)
+{
+    switch (op)
+    {
+    case '+':
+        if (b > 0 && a > INT_MAX - b)
+            throw overflow_error("overflow occured");
+        if (b < 0 && a < INT_MIN - b)
+            throw overflow_error("overflow occured");
+        break;
+
+    case '-':
+        if (b > 0 && a < INT_MIN + b)
+            throw overflow_error("overflow occured");
+        if (b < 0 && a > INT_MAX + b)
+            throw overflow_error("overflow occured");
+        break;
+
+    case '*':
+        if (b > 0 && (a > INT_MAX / b || a < INT_MIN / b))
+            throw overflow_error("overflow occured");
+        if (b < 0 && (a < INT_MAX / b || a > INT_MIN / b))
+            throw overflow_error("overflow occured");
+        break;
     }
 }
