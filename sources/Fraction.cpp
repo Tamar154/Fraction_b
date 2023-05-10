@@ -4,6 +4,7 @@
 #include <cmath>
 
 using namespace ariel;
+
 using namespace std;
 
 // Default constructor
@@ -14,7 +15,7 @@ Fraction::Fraction(const int &numerator, const int &denominator)
 {
     if (denominator == 0)
     {
-        throw "denominator cannot be zero!";
+        throw runtime_error("denominator cannot be zero!");
     }
 
     if (numerator < 0 && denominator < 0)
@@ -211,7 +212,50 @@ Fraction Fraction::operator--(int postfix) // postfix
     Output
 */
 
+ostream &ariel::operator<<(ostream &output, const Fraction &frac)
+{
+    output << frac.getNumerator() << "/" << frac.getDenominator();
+    return output;
+}
 
+std::ostream &ariel::operator<<(std::ostream &output, float &flo)
+{
+    Fraction frac(flo);
+    return output << frac;
+}
+
+/*
+    Input
+*/
+std::istream &ariel::operator>>(std::istream &input, Fraction &frac)
+{
+    int numerator = 0;
+    int denominator = 1;
+
+    input >> numerator >> denominator;
+
+    if (!input)
+    {
+        throw invalid_argument("Invalid input");
+    }
+
+    if (denominator == 0)
+    {
+        throw runtime_error("denominator cannot be zero!");
+    }
+
+    frac._numerator = numerator;
+    frac._denominator = denominator;
+
+    cout << frac << endl;
+    return input;
+}
+
+std::istream &ariel::operator>>(std::istream &input, float &flo)
+{
+    Fraction frac(flo);
+    return input >> frac;
+}
 
 /*
     Helper functions

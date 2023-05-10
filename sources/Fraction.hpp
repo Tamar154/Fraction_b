@@ -5,6 +5,7 @@ const int ACC_FACTOR = 1000.0;
 
 namespace ariel
 {
+
     class Fraction
     {
 
@@ -120,17 +121,14 @@ namespace ariel
         /*
            << oprator
          */
-        friend std::ostream &operator<<(std::ostream &output, const Fraction &frac)
-        {
-            return (output << frac.getNumerator() << "/" << frac.getDenominator());
-        }
-        friend std::ostream &operator<<(std::ostream &output, const float &flo) { return output << flo; }
+        friend std::ostream &operator<<(std::ostream &output, const Fraction &frac);
+        friend std::ostream &operator<<(std::ostream &output, float &flo);
 
         /*
            >> oprator
          */
-        friend std::istream &operator>>(std::istream &input, const Fraction &frac) { return input; }
-        friend std::istream &operator>>(std::istream &input, const float &flo) { return input; }
+        friend std::istream &operator>>(std::istream &input, Fraction &frac);
+        friend std::istream &operator>>(std::istream &input, float &flo);
 
         void reduceFrac(); // friend??
         static float floatThreeDecimalAcc(float flo)
@@ -140,4 +138,5 @@ namespace ariel
 
         } // friend??
     };
+
 }
