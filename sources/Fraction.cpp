@@ -15,7 +15,7 @@ Fraction::Fraction(const int &numerator, const int &denominator)
 {
     if (denominator == 0)
     {
-        throw runtime_error("denominator cannot be zero!");
+        throw invalid_argument("denominator cannot be zero!");
     }
 
     if (numerator < 0 && denominator < 0)
@@ -129,6 +129,10 @@ Fraction Fraction::operator*(const float &flo) const
 */
 Fraction Fraction::operator/(const Fraction &other) const
 {
+    if (other._numerator == 0)
+    {
+        throw runtime_error("Cannot divide by zero!");
+    }
     int numerator = this->_numerator * other._denominator;
     int denominator = this->_denominator * other._numerator;
 
@@ -138,6 +142,10 @@ Fraction Fraction::operator/(const Fraction &other) const
 
 Fraction Fraction::operator/(const float &flo) const
 {
+    if (flo == 0.0)
+    {
+        throw runtime_error("Cannot divide by zero!");
+    }
     float accurate_val = floatThreeDecimalAcc(flo);
     Fraction frac2(accurate_val);
     return *this / frac2;
@@ -234,20 +242,21 @@ std::istream &ariel::operator>>(std::istream &input, Fraction &frac)
 
     input >> numerator >> denominator;
 
+    if (denominator == 0)
+    {
+        input.clear();
+        throw runtime_error("denominator cannot be zero!");
+    }
+
     if (!input)
     {
         throw invalid_argument("Invalid input");
     }
 
-    if (denominator == 0)
-    {
-        throw runtime_error("denominator cannot be zero!");
-    }
+    Fraction temp(numerator, denominator);
+    frac._numerator = temp.getNumerator();
+    frac._denominator = temp.getDenominator();
 
-    frac._numerator = numerator;
-    frac._denominator = denominator;
-
-    cout << frac << endl;
     return input;
 }
 
